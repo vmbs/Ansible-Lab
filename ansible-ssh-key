@@ -1,0 +1,22 @@
+  - name: "Set up authorized_keys for the root user"
+    hosts: centos
+    user: centos
+
+  tasks:
+
+  - name: Create new ssh key-pair
+    local_action: command ssh-keygen -t rsa -N "" -q -f ~/test/id_rsa
+  
+        
+  - name: Set up authorized_keys for the pi user
+    authorized_key: user=centos key="{{ item }}" state=present exclusive=yes 
+    with_file:
+      - ~/test/id_rsa.pub
+
+  - name: move key-pair  
+    local_action: command mv ~/test/id_rsa ~/test/id_rsa.bak
+    run_once: true
+
+  - name: move key-pair  
+    local_action: command mv ~/test/id_rsa.pub ~/test/id_rsa.pub.bak
+    run_once: true
